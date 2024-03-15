@@ -80,6 +80,21 @@
       "mode": "view"
     },
     {
+      "name": "genImage",
+      "title": "Generate Image",
+      "icon": "image-icon.png",
+      "description": "Generate image from a text prompt",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "query",
+          "placeholder": "Prompt",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
       "name": "professional",
       "title": "Change Tone to Professional",
       "icon": "text-icon.png",
@@ -138,6 +153,24 @@
         }
       ],
       "default": "GPT"
+    },
+    {
+      "description": "Image Provider",
+      "name": "imageProvider",
+      "required": false,
+      "title": "Image Provider",
+      "type": "dropdown",
+      "data": [
+          {
+          "title": "Prodia",
+          "value": "Prodia"
+          },
+          {
+          "title": "ProdiaStableDiffusionXL",
+          "value": "ProdiaStableDiffusionXL"
+          }
+      ],
+      "default": "Prodia"
     }
   ],
 
