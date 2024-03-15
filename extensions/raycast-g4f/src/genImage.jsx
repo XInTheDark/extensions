@@ -7,7 +7,7 @@ import {
   Form,
   useNavigation,
   confirmAlert,
-  getPreferenceValues, List,
+  getPreferenceValues,
 } from "@raycast/api";
 import { useState, useEffect } from "react";
 import * as G4F from "g4f";
@@ -349,16 +349,16 @@ export default function genImage({ launchContext }) {
   };
 
   return chatData === null ? (
-    <List searchText={searchText} onSearchTextChange={setSearchText}>
-      <List.EmptyView icon={Icon.Stars} title="Send a Prompt to GPT to get started." />
-    </List>
+    <Grid searchText={searchText} onSearchTextChange={setSearchText}>
+      <Grid.EmptyView icon={Icon.Stars} title="Send a Prompt to GPT to get started." />
+    </Grid>
   ) : (
-    <List
+    <Grid
       searchText={searchText}
       onSearchTextChange={setSearchText}
       searchBarPlaceholder="Generate image..."
       searchBarAccessory={
-        <List.Dropdown
+        <Grid.Dropdown
           tooltip="Your Image Chats"
           onChange={(newValue) => {
             setChatData((oldData) => ({
@@ -369,16 +369,16 @@ export default function genImage({ launchContext }) {
           value={chatData.currentChat}
         >
           {chatData.chats.map((x) => {
-            return <List.Dropdown.Item title={x.name} value={x.name} key={x.name} />;
+            return <Grid.Dropdown.Item title={x.name} value={x.name} key={x.name} />;
           })}
-        </List.Dropdown>
+        </Grid.Dropdown>
       }
     >
       {(() => {
         let chat = getChat(chatData.currentChat);
         if (!chat.messages.length) {
           return (
-            <List.EmptyView
+            <Grid.EmptyView
               icon={Icon.Stars}
               title="Send a Prompt to GPT to get started."
               actions={<ImageActionPanel />}
@@ -386,10 +386,9 @@ export default function genImage({ launchContext }) {
           );
         }
         return chat.messages.map((x, i) => {
-          console.log("x.answer: " + x.answer);
           return (
-              <List.Item
-              icon={{ source: x.answer }} // image path
+              <Grid.Item
+              content={{ source: x.answer }} // image path
               title={x.prompt}
               subtitle={formatDate(x.creationDate)}
               key={x.prompt + x.creationDate}
@@ -398,7 +397,7 @@ export default function genImage({ launchContext }) {
           );
         });
       })()}
-    </List>
+    </Grid>
   );
 }
 
