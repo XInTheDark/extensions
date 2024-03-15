@@ -129,6 +129,10 @@
           "value": "GPT"
         },
         {
+          "title": "ChatBase",
+          "value": "ChatBase"
+        },
+        {
           "title": "Bing",
           "value": "Bing"
         }

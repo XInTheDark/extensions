@@ -121,29 +121,38 @@ export default function Chat({ launchContext }) {
                     // load provider and model from preferences
                     const preferences = getPreferenceValues();
                     const providerString = preferences["gptProvider"];
-                    const [provider, model] = g4f_providers[providerString];
+                    const [provider, model, stream] = g4f_providers[providerString];
                     const options = {
                       provider: provider,
                       model: model,
+                      stream: stream,
                     };
 
-                    // generate response
-                    let response = await g4f.chatCompletion(aiChat, options);
-
-                    setChatData((oldData) => {
-                      let newChatData = structuredClone(oldData);
+                    // generate response - support for streaming.
+                    await (async () => {
                       getChat(chatData.currentChat, newChatData.chats).messages[0].prompt = query;
-                      getChat(chatData.currentChat, newChatData.chats).messages[0].answer = response;
-                      return newChatData;
-                    });
 
-                    setChatData((oldData) => {
-                      let newChatData = structuredClone(oldData);
-                      getChat(chatData.currentChat, newChatData.chats).messages[0].finished = true;
-                      return newChatData;
-                    });
+                      let response = await g4f.chatCompletion(aiChat, options);
+                      console.log(response);
+                      let text = "";
 
-                    toast(Toast.Style.Success, "Response Loaded");
+                      for await (const chunk of G4F.chunkProcessor(response)) {
+                        text += chunk;
+                        setChatData((oldData) => {
+                          let newChatData = structuredClone(oldData);
+                          getChat(chatData.currentChat, newChatData.chats).messages[0].answer = text;
+                          return newChatData;
+                        });
+                      }
+
+                      setChatData((oldData) => {
+                        let newChatData = structuredClone(oldData);
+                        getChat(chatData.currentChat, newChatData.chats).messages[0].finished = true;
+                        return newChatData;
+                      });
+
+                      toast(Toast.Style.Success, "Response Loaded");
+                    });
                   } catch {
                     setChatData((oldData) => {
                       let newChatData = structuredClone(oldData);
@@ -295,28 +304,35 @@ export default function Chat({ launchContext }) {
               // load provider and model from preferences
               const preferences = getPreferenceValues();
               const providerString = preferences["gptProvider"];
-              const [provider, model] = g4f_providers[providerString];
+              const [provider, model, stream] = g4f_providers[providerString];
               const options = {
                 provider: provider,
                 model: model,
+                stream: stream,
               };
 
-              // generate response
-              let response = await g4f.chatCompletion(aiChat, options);
+              // generate response - support for streaming.
+              await (async () => {
+                let response = await g4f.chatCompletion(aiChat, options);
+                let text = "";
 
-              setChatData((oldData) => {
-                let newChatData = structuredClone(oldData);
-                getChat(chatData.currentChat, newChatData.chats).messages[0].answer = response;
-                return newChatData;
+                for await (const chunk of G4F.chunkProcessor(response)) {
+                  text += chunk;
+                  setChatData((oldData) => {
+                    let newChatData = structuredClone(oldData);
+                    getChat(chatData.currentChat, newChatData.chats).messages[0].answer = text;
+                    return newChatData;
+                  });
+                }
+
+                setChatData((oldData) => {
+                  let newChatData = structuredClone(oldData);
+                  getChat(newData.currentChat, newChatData.chats).messages[0].finished = true;
+                  return newChatData;
+                });
+
+                toast(Toast.Style.Success, "Response Loaded");
               });
-
-              setChatData((oldData) => {
-                let newChatData = structuredClone(oldData);
-                getChat(newData.currentChat, newChatData.chats).messages[0].finished = true;
-                return newChatData;
-              });
-
-              toast(Toast.Style.Success, "Response Loaded");
             } catch {
               setChatData((oldData) => {
                 let newChatData = structuredClone(oldData);
@@ -325,7 +341,7 @@ export default function Chat({ launchContext }) {
               });
               toast(Toast.Style.Failure, "GPT cannot process this message.");
             }
-          })();
+          });
         }
 
         setChatData(structuredClone(newData));

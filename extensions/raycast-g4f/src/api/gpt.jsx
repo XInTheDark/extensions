@@ -51,10 +51,11 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
       // load provider and model from preferences
       const preferences = getPreferenceValues();
       const providerString = preferences["gptProvider"];
-      const [provider, model] = g4f_providers[providerString];
+      const [provider, model, stream] = g4f_providers[providerString];
       const options = {
         provider: provider,
         model: model,
+        stream: stream,
       };
 
       // generate response
@@ -180,6 +181,8 @@ export default (props, { context = undefined, allowPaste = false, useSelected = 
 };
 
 export const g4f_providers = {
-  GPT: [g4f.providers.GPT, "gpt-4-32k"],
-  Bing: [g4f.providers.Bing, "gpt-4"],
+  // [provider, model, stream]
+  GPT: [g4f.providers.GPT, "gpt-4-32k", true],
+  ChatBase: [g4f.providers.ChatBase, "gpt-3.5-turbo", true],
+  Bing: [g4f.providers.Bing, "gpt-4", true],
 };
