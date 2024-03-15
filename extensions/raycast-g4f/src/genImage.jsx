@@ -15,7 +15,7 @@ const g4f = new G4F.G4F();
 import { g4f_providers } from "./api/gpt";
 import fetch from "node-fetch-polyfill";
 import fs from "fs";
-import { LocalStorage, environment, Grid } from "@raycast/api";
+import { LocalStorage, environment, Grid, Clipboard } from "@raycast/api";
 
 export default function genImage({ launchContext }) {
   let toast = async (style, title, message) => {
@@ -163,6 +163,19 @@ export default function genImage({ launchContext }) {
             }
           }}
         />
+        <Action
+          icon={Icon.Clipboard}
+          title="Copy Image Path"
+          onAction={async () => {
+            const filePath = getChat(chatData.currentChat).messages[0].answer;
+            if (!filePath) {
+              toast(Toast.Style.Failure, "Image does not exist");
+              return;
+            }
+
+            await Clipboard.copy(filePath);
+          }}
+        />
         <ActionPanel.Section title="Manage Image Chats">
           <Action.Push
             icon={Icon.PlusCircle}
@@ -281,8 +294,7 @@ export default function genImage({ launchContext }) {
       if (storedChatData) {
         let newData = JSON.parse(storedChatData);
         setChatData(structuredClone(newData));
-      }
-      else {
+      } else {
         const newChatData = {
           currentChat: "New Image Chat",
           chats: [
@@ -349,11 +361,12 @@ export default function genImage({ launchContext }) {
   };
 
   return chatData === null ? (
-    <Grid searchText={searchText} onSearchTextChange={setSearchText}>
+    <Grid columns={4} searchText={searchText} onSearchTextChange={setSearchText}>
       <Grid.EmptyView icon={Icon.Stars} title="Send a Prompt to GPT to get started." />
     </Grid>
   ) : (
     <Grid
+      columns={4}
       searchText={searchText}
       onSearchTextChange={setSearchText}
       searchBarPlaceholder="Generate image..."
@@ -387,13 +400,13 @@ export default function genImage({ launchContext }) {
         }
         return chat.messages.map((x, i) => {
           return (
-              <Grid.Item
+            <Grid.Item
               content={{ source: x.answer }} // image path
               title={x.prompt}
               subtitle={formatDate(x.creationDate)}
               key={x.prompt + x.creationDate}
               actions={<ImageActionPanel idx={i} />}
-              />
+            />
           );
         });
       })()}
