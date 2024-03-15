@@ -82,17 +82,10 @@
     {
       "name": "genImage",
       "title": "Generate Image",
+      "subtitle": "GPT4Free",
       "icon": "image-icon.png",
       "description": "Generate image from a text prompt",
-      "mode": "view",
-      "arguments": [
-        {
-          "name": "query",
-          "placeholder": "Prompt",
-          "type": "text",
-          "required": true
-        }
-      ]
+      "mode": "view"
     },
     {
       "name": "professional",
